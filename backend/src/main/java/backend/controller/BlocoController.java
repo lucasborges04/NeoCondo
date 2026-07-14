@@ -1,7 +1,8 @@
 package backend.controller;
 
-import backend.model.Bloco;
-import backend.repository.BlocoRepository;
+import backend.dto.BlocoRequestDTO;
+import backend.dto.BlocoResponseDTO;
+import backend.service.BlocoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,20 +12,20 @@ import java.util.List;
 @RequestMapping("/api/blocos")
 public class BlocoController {
 
-    private final BlocoRepository blocoRepository;
+    private final BlocoService blocoService;
 
-    public BlocoController(BlocoRepository blocoRepository) {
-        this.blocoRepository = blocoRepository;
+    public BlocoController(BlocoService blocoService) {
+        this.blocoService = blocoService;
     }
 
     @GetMapping
-    public List<Bloco> listarTodos() {
-        return blocoRepository.findAll();
+    public List<BlocoResponseDTO> listarTodos() {
+        return blocoService.listarTodos();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Bloco criarNovoBloco(@RequestBody Bloco bloco) {
-        return blocoRepository.save(bloco);
+    public BlocoResponseDTO criarNovoBloco(@RequestBody BlocoRequestDTO dto) {
+        return blocoService.criarNovoBloco(dto);
     }
 }
