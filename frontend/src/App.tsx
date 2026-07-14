@@ -1,28 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Bloco } from "./features/unidades/types";
 import { BlocoCard } from "./features/unidades/components/BlocoCard";
 import { BlocoForm } from "./features/unidades/components/BlocoForm";
+import { api } from "./services/api";
 
 export function App() {
-  // 1. Transformamos a variável fixa em um "Estado" do React.
-  // Usamos o Generic <Bloco[]> para avisar o TS que essa memória guardará uma lista de Blocos.
-  const [blocos, setBlocos] = useState<Bloco[]>([
-    { id: 1, nome: "Bloco A - Girassol" },
-    { id: 2, nome: "Bloco B - Orquídea" },
-  ]);
+  const [blocos, setBlocos] = useState<Bloco[]>([]);
 
-  // 2. Criamos a função que sabe como adicionar um novo bloco na lista
-  function adicionarBloco(nomeDoNovoBloco: string) {
-    // Simulando a criação de um ID (já que ainda não temos o banco de dados)
-    const novoId = blocos.length > 0 ? blocos[blocos.length - 1].id + 1 : 1;
+  useEffect(() => {
+    carregarBlocos();
+  }, []);
 
-    const novoBloco: Bloco = {
-      id: novoId,
-      nome: nomeDoNovoBloco,
-    };
+  async function carregarBlocos() {
+    try {
+      const response = await api.get("/blocos");
+      setBlocos(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar blocos:", error);
+      alert("Não foi possível carregar a lista de blocos do servidor.");
+    }
+  }
 
-    // Atualizamos a memória: pegamos todos os blocos antigos (...blocos) e adicionamos o novo no final
-    setBlocos([...blocos, novoBloco]);
+  async function adicionarBloco(nomeDoNovoBloco: string) {
+    try {
+      const response = await api.post("/blocos", { nome: nomeDoNovoBloco });
+      const novoBlocoSalvo = response.data;
+
+      setBlocos([...blocos, novoBlocoSalvo]);
+    } catch (error) {
+      console.error("Erro ao salvar bloco:", error);
+      alert("Não foi possível salvar o bloco no banco de dados.");
+    }
   }
 
   return (
@@ -32,13 +40,18 @@ export function App() {
           NeoCondo - Gestão de Unidades
         </h1>
 
-        {/* 3. Injetamos o formulário na tela e passamos a nossa função como propriedade */}
         <BlocoForm onSalvar={adicionarBloco} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blocos.map((blocoAtual) => (
-            <BlocoCard key={blocoAtual.id} bloco={blocoAtual} />
-          ))}
+          {blocos.length === 0 ? (
+            <p className="text-gray-500 col-span-full text-center py-8">
+              Nenhum bloco cadastrado ainda.
+            </p>
+          ) : (
+            blocos.map((blocoAtual) => (
+              <BlocoCard key={blocoAtual.id} bloco={blocoAtual} />
+            ))
+          )}
         </div>
       </div>
     </div>
