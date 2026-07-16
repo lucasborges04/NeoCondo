@@ -3,6 +3,7 @@ package backend.controller;
 import backend.dto.MoradorRequestDTO;
 import backend.dto.MoradorResponseDTO;
 import backend.service.MoradorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class MoradorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MoradorResponseDTO criarNovoMorador(@RequestBody MoradorRequestDTO dto) {
+    public MoradorResponseDTO criarNovoMorador(@Valid @RequestBody MoradorRequestDTO dto) {
         return moradorService.criarNovoMorador(dto);
     }
 }
