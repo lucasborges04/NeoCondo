@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { SubmitEvent } from "react";
+import { toast } from "react-hot-toast";
 
 interface BlocoFormProps {
   onSalvar: (nomeDoBloco: string) => void;
@@ -11,8 +12,10 @@ export function BlocoForm({ onSalvar }: BlocoFormProps) {
   function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (nome.trim() === "") {
-      alert("O nome do bloco é obrigatório!");
+    const nomeLimpo = nome.trim();
+
+    if (!nomeLimpo) {
+      toast.error("O nome do bloco não pode ser vazio.");
       return;
     }
 

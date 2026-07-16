@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 import type { Bloco } from "../types";
+import { toast } from "react-hot-toast";
 
 interface UnidadeFormProps {
   blocosDisponiveis: Bloco[];
@@ -14,13 +15,15 @@ export function UnidadeForm({ blocosDisponiveis, onSalvar }: UnidadeFormProps) {
   function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (numero.trim() === "") {
-      alert("O número da unidade é obrigatório!");
+    const numeroLimpo = numero.trim();
+
+    if (!numeroLimpo) {
+      toast.error("O número da unidade é obrigatório!");
       return;
     }
 
     if (blocoIdSelecionado === "") {
-      alert("Você deve selecionar um bloco!");
+      toast.error("Você deve selecionar um bloco!");
       return;
     }
 

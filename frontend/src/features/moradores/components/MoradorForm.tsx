@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 import type { Unidade } from "../../unidades/types";
+import { toast } from "react-hot-toast";
 
 interface MoradorFormProps {
   unidadesDisponiveis: Unidade[];
@@ -26,13 +27,26 @@ export function MoradorForm({
   function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (nome.trim() === "" || cpf.trim() === "") {
-      alert("Nome e CPF são obrigatórios!");
+    const nomeLimpo = nome.trim();
+    const cpfLimpo = cpf.trim();
+
+    if (!nomeLimpo && !cpfLimpo) {
+      toast.error("Nome e CPF são obrigatórios!");
+      return;
+    }
+
+    if (!nomeLimpo) {
+      toast.error("Nome é obrigatório!");
+      return;
+    }
+
+    if (!cpfLimpo) {
+      toast.error("CPF é obrigatório!");
       return;
     }
 
     if (unidadeIdSelecionada === "") {
-      alert("Você deve selecionar uma unidade onde o morador reside!");
+      toast.error("Você deve selecionar uma unidade onde o morador reside!");
       return;
     }
 
