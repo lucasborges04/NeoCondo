@@ -10,6 +10,8 @@ import { MoradorCard } from "./features/moradores/components/MoradorCard";
 import { MoradorForm } from "./features/moradores/components/MoradorForm";
 
 import { api } from "./services/api";
+import { isAxiosError } from "axios";
+import { Toaster, toast } from "react-hot-toast";
 
 export function App() {
   const [blocos, setBlocos] = useState<Bloco[]>([]);
@@ -27,7 +29,7 @@ export function App() {
       const response = await api.get("/blocos");
       setBlocos(response.data);
     } catch (error) {
-      console.error("Erro ao carregar blocos:", error);
+      toast.error("Erro ao carregar blocos.");
     }
   }
 
@@ -36,7 +38,7 @@ export function App() {
       const response = await api.get("/unidades");
       setUnidades(response.data);
     } catch (error) {
-      console.error("Erro ao carregar unidades:", error);
+      toast.error("Erro ao carregar unidades.");
     }
   }
 
@@ -45,7 +47,7 @@ export function App() {
       const response = await api.get("/moradores");
       setMoradores(response.data);
     } catch (error) {
-      console.error("Erro ao carregar moradores:", error);
+      toast.error("Erro ao carregar moradores.");
     }
   }
 
@@ -53,8 +55,9 @@ export function App() {
     try {
       const response = await api.post("/blocos", { nome: nomeDoNovoBloco });
       setBlocos([...blocos, response.data]);
+      toast.success("Bloco cadastrado com sucesso!");
     } catch (error) {
-      alert("Não foi possível salvar o bloco.");
+      toast.error("Não foi possível salvar o bloco.");
     }
   }
 
@@ -65,8 +68,9 @@ export function App() {
         bloco: { id: idDoBloco },
       });
       setUnidades([...unidades, response.data]);
+      toast.success("Unidade cadastrada com sucesso!");
     } catch (error) {
-      alert("Não foi possível salvar a unidade.");
+      toast.error("Não foi possível salvar a unidade.");
     }
   }
 
@@ -86,16 +90,31 @@ export function App() {
 
       const response = await api.post("/moradores", payload);
       setMoradores([...moradores, response.data]);
+      toast.success("Morador cadastrado com sucesso!");
     } catch (error) {
-      console.error("Erro ao salvar morador:", error);
-      alert(
-        "Não foi possível salvar o morador. Verifique se o CPF já existe no banco.",
-      );
+      if (isAxiosError(error) && error.response) {
+        const dadosErro = error.response.data;
+
+        // Erro de banco de dados ou regra de negócio
+        if (dadosErro.erro) {
+          toast.error(dadosErro.erro);
+        }
+        // Erro de Validação do DTO
+        else {
+          Object.values(dadosErro).forEach((mensagem) => {
+            toast.error(String(mensagem));
+          });
+        }
+      } else {
+        toast.error("Ocorreu um erro inesperado de conexão.");
+      }
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      <Toaster position="top-right" />
+
       <div className="max-w-7xl mx-auto space-y-12">
         <h1 className="text-3xl text-gray-800 font-bold border-b pb-4">
           NeoCondo - Dashboard Admin
@@ -106,10 +125,9 @@ export function App() {
             Gestão de Blocos
           </h2>
           <BlocoForm onSalvar={adicionarBloco} />
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blocos.map((blocoAtual) => (
-              <BlocoCard key={blocoAtual.id} bloco={blocoAtual} />
+            {blocos.map((bloco) => (
+              <BlocoCard key={bloco.id} bloco={bloco} />
             ))}
           </div>
         </section>
@@ -121,10 +139,9 @@ export function App() {
             Gestão de Unidades
           </h2>
           <UnidadeForm blocosDisponiveis={blocos} onSalvar={adicionarUnidade} />
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {unidades.map((unidadeAtual) => (
-              <UnidadeCard key={unidadeAtual.id} unidade={unidadeAtual} />
+            {unidades.map((unidade) => (
+              <UnidadeCard key={unidade.id} unidade={unidade} />
             ))}
           </div>
         </section>
@@ -135,20 +152,18 @@ export function App() {
           <h2 className="text-2xl font-bold text-gray-700 mb-6">
             Gestão de Moradores
           </h2>
-
           <MoradorForm
             unidadesDisponiveis={unidades}
             onSalvar={adicionarMorador}
           />
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {moradores.length === 0 ? (
               <p className="text-gray-500 col-span-full">
                 Nenhum morador cadastrado ainda.
               </p>
             ) : (
-              moradores.map((moradorAtual) => (
-                <MoradorCard key={moradorAtual.id} morador={moradorAtual} />
+              moradores.map((morador) => (
+                <MoradorCard key={morador.id} morador={morador} />
               ))
             )}
           </div>
