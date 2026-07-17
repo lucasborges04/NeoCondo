@@ -31,10 +31,17 @@ public class BlocoService {
 
         blocoParaSalvar.setNome(dto.nome());
 
-        // Manda o Repository salvar no banco (o Hibernate gera o ID aqui)
+        // O Hibernate gera o ID
         Bloco blocoSalvo = blocoRepository.save(blocoParaSalvar);
 
         // Coloca a Entidade salva dentro do envelope de resposta (ResponseDTO)
         return new BlocoResponseDTO(blocoSalvo.getId(), blocoSalvo.getNome());
+    }
+
+    public void excluirBloco(Long id) {
+        if (!blocoRepository.existsById(id)) {
+            throw new RuntimeException("Bloco não encontrado para exclusão.");
+        }
+        blocoRepository.deleteById(id);
     }
 }

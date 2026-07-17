@@ -27,25 +27,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
     }
 
+    // 2. Captura os gritos de socorro do Banco de Dados (Ex: unique=true ou Foreign Key)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> tratarErrosDeBancoDeDados(DataIntegrityViolationException ex) {
         Map<String, String> erro = new HashMap<>();
 
-        // Verifica se o erro foi causado pela restrição de CPF
-        if (ex.getMessage() != null && ex.getMessage().contains("cpf")) {
+        String mensagemExcecao = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+
+        if (mensagemExcecao.contains("cpf")) {
             erro.put("erro", "Este CPF já está cadastrado no sistema.");
-        } else {
+        }
+        else if (mensagemExcecao.contains("constraint") || mensagemExcecao.contains("foreign key") || mensagemExcecao.contains("fk_")) {
+            erro.put("erro", "Não é possível excluir este registro, pois existem outros dados vinculados a ele.");
+        }
+        else {
             erro.put("erro", "Ocorreu um erro de integridade no banco de dados.");
         }
 
-        // Devolve Status 409 (Conflict) pois houve um conflito de dados
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> tratarErrosDeRegraDeNegocio(RuntimeException ex) {
-        Map<String, String> erro = new HashMap<>();
-        erro.put("erro", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 }

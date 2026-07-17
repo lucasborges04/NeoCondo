@@ -28,4 +28,10 @@ public class BlocoController {
     public BlocoResponseDTO criarNovoBloco(@RequestBody BlocoRequestDTO dto) {
         return blocoService.criarNovoBloco(dto);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Retorna o Status 204 (Sucesso, mas sem corpo de resposta)
+    public void excluirBloco(@PathVariable Long id) {
+        blocoService.excluirBloco(id);
+    }
 }
