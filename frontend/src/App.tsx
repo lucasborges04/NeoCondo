@@ -61,6 +61,23 @@ export function App() {
     }
   }
 
+  async function excluirBloco(idDoBloco: number) {
+    try {
+      await api.delete(`/blocos/${idDoBloco}`);
+
+      setBlocos(blocos.filter((bloco) => bloco.id !== idDoBloco));
+
+      toast.success("Bloco excluído com sucesso!");
+    } catch (error) {
+      // Captura o aviso do GlobalExceptionHandler (ex: Bloco com unidades)
+      if (isAxiosError(error) && error.response && error.response.data.erro) {
+        toast.error(error.response.data.erro);
+      } else {
+        toast.error("Não foi possível excluir o bloco.");
+      }
+    }
+  }
+
   async function adicionarUnidade(numeroDaUnidade: string, idDoBloco: number) {
     try {
       const response = await api.post("/unidades", {
@@ -126,8 +143,12 @@ export function App() {
           </h2>
           <BlocoForm onSalvar={adicionarBloco} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blocos.map((bloco) => (
-              <BlocoCard key={bloco.id} bloco={bloco} />
+            {blocos.map((blocoAtual) => (
+              <BlocoCard
+                key={blocoAtual.id}
+                bloco={blocoAtual}
+                onExcluir={excluirBloco}
+              />
             ))}
           </div>
         </section>
