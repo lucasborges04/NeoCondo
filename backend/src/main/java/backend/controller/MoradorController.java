@@ -29,4 +29,10 @@ public class MoradorController {
     public MoradorResponseDTO criarNovoMorador(@Valid @RequestBody MoradorRequestDTO dto) {
         return moradorService.criarNovoMorador(dto);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirMorador(@PathVariable Long id) {
+        moradorService.excluirMorador(id);
+    }
 }

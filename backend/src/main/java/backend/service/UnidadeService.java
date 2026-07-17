@@ -45,6 +45,13 @@ public class UnidadeService {
         return converterParaResponseDTO(unidadeSalva);
     }
 
+    public void excluirUnidade(Long id) {
+        if (!unidadeRepository.existsById(id)) {
+            throw new RuntimeException("Unidade não encontrada para exclusão.");
+        }
+        unidadeRepository.deleteById(id);
+    }
+
     private UnidadeResponseDTO converterParaResponseDTO(Unidade unidade) {
         BlocoResponseDTO blocoDTO = new BlocoResponseDTO(
                 unidade.getBloco().getId(),

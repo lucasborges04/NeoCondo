@@ -28,4 +28,10 @@ public class UnidadeController {
     public UnidadeResponseDTO criarNovaUnidade(@RequestBody UnidadeRequestDTO dto) {
         return unidadeService.criarNovaUnidade(dto);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirUnidade(@PathVariable Long id) {
+        unidadeService.excluirUnidade(id);
+    }
 }

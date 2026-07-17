@@ -78,6 +78,30 @@ export function App() {
     }
   }
 
+  async function excluirUnidade(idDaUnidade: number) {
+    try {
+      await api.delete(`/unidades/${idDaUnidade}`);
+      setUnidades(unidades.filter((unidade) => unidade.id !== idDaUnidade));
+      toast.success("Unidade excluída com sucesso!");
+    } catch (error) {
+      if (isAxiosError(error) && error.response && error.response.data.erro) {
+        toast.error(error.response.data.erro);
+      } else {
+        toast.error("Não foi possível excluir a unidade.");
+      }
+    }
+  }
+
+  async function excluirMorador(idDoMorador: number) {
+    try {
+      await api.delete(`/moradores/${idDoMorador}`);
+      setMoradores(moradores.filter((morador) => morador.id !== idDoMorador));
+      toast.success("Morador excluído com sucesso!");
+    } catch (error) {
+      toast.error("Não foi possível excluir o morador.");
+    }
+  }
+
   async function adicionarUnidade(numeroDaUnidade: string, idDoBloco: number) {
     try {
       const response = await api.post("/unidades", {
@@ -161,8 +185,13 @@ export function App() {
           </h2>
           <UnidadeForm blocosDisponiveis={blocos} onSalvar={adicionarUnidade} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {unidades.map((unidade) => (
-              <UnidadeCard key={unidade.id} unidade={unidade} />
+            {unidades.map((unidadeAtual) => (
+              <UnidadeCard
+                key={unidadeAtual.id}
+                unidade={unidadeAtual}
+                blocos={blocos}
+                onExcluir={excluirUnidade}
+              />
             ))}
           </div>
         </section>
@@ -183,8 +212,13 @@ export function App() {
                 Nenhum morador cadastrado ainda.
               </p>
             ) : (
-              moradores.map((morador) => (
-                <MoradorCard key={morador.id} morador={morador} />
+              moradores.map((moradorAtual) => (
+                <MoradorCard
+                  key={moradorAtual.id}
+                  morador={moradorAtual}
+                  unidades={unidades}
+                  onExcluir={excluirMorador}
+                />
               ))
             )}
           </div>

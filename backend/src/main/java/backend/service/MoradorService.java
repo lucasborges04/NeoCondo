@@ -41,6 +41,13 @@ public class MoradorService {
         return converterParaResponseDTO(moradorSalvo);
     }
 
+    public void excluirMorador(Long id) {
+        if (!moradorRepository.existsById(id)) {
+            throw new RuntimeException("Morador não encontrado para exclusão.");
+        }
+        moradorRepository.deleteById(id);
+    }
+
     // Metodo auxiliar para montar a árvore completa de DTOs (Morador -> Unidade -> Bloco)
     private MoradorResponseDTO converterParaResponseDTO(Morador morador) {
         BlocoResponseDTO blocoDTO = new BlocoResponseDTO(
